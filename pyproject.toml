@@ -1,0 +1,47 @@
+[project]
+name = "bifrost-llm-gateway"
+version = "0.1.0"
+description = "OpenHost app wrapping the Bifrost LLM gateway."
+requires-python = "==3.12.*"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "ruff",
+    "pre-commit",
+    "pytest>=8.0",
+    "httpx>=0.27",
+    "pytest-playwright",
+    "playwright",
+    # Builds the app's Dockerfile, runs it under podman with the mounts/env its
+    # openhost.toml declares, and fronts it with a mock router that injects owner
+    # auth. Tests hit a real, containerized app. Requires podman on the host.
+    "openhost-test-harness @ git+https://github.com/imbue-openhost/openhost-app-test-harness@main",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+addopts = "-v"
+
+[tool.ruff]
+line-length = 119
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "F",      # pyflakes
+    "B",      # flake8-bugbear
+    "UP",     # pyupgrade (modern Python syntax)
+    "I",      # isort
+]
+ignore = ["E501"]  # line length handled by formatter
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.ruff.lint.isort]
+force-single-line = true
+case-sensitive = true

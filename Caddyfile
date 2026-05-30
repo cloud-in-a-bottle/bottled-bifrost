@@ -1,0 +1,42 @@
+{
+	admin off
+	auto_https off
+	persist_config off
+}
+
+:8080 {
+	log {
+		output stdout
+		format console
+	}
+
+	# OpenHost's health probe — must reach the app without auth.
+	handle /health {
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	# Cross-app service interface. The OpenHost router proxies service calls here
+	# (rooted at the provider's /service endpoint) and injects X-OpenHost-Permissions.
+	# Require the `full_access` grant, then expose ONLY Bifrost's inference APIs
+	# (OpenAI/Anthropic/GenAI-compatible) — never the web UI or management API.
+	# strip_prefix maps /service/openai/v1/chat/completions -> /openai/v1/chat/completions.
+	handle_path /service/* {
+		route {
+			@denied not header_regexp X-OpenHost-Permissions `"grant"\s*:\s*"full_access"`
+			header @denied Content-Type application/json
+			respond @denied `{"error":"permission_required","required_grant":{"grant":"full_access","scope":"global"}}` 403
+
+			@inference path /openai /openai/* /anthropic /anthropic/* /genai /genai/*
+			reverse_proxy @inference 127.0.0.1:3000
+
+			header Content-Type application/json
+			respond `{"error":"not_found","detail":"only the inference API is exposed on the service interface"}` 404
+		}
+	}
+
+	# Bifrost web UI + management API. Not permission-gated here — OpenHost gates
+	# these to the logged-in owner (the app declares no public_paths).
+	handle {
+		reverse_proxy 127.0.0.1:3000
+	}
+}

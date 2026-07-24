@@ -1,4 +1,4 @@
-FROM maximhq/bifrost:v1.5.6
+FROM maximhq/bifrost:v1.6.6
 
 # Caddy fronts Bifrost on the container port: it permission-gates the cross-app
 # service interface and limits it to the inference API, while leaving the web UI

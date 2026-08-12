@@ -4,6 +4,21 @@ An OpenHost app that runs the [Bifrost](https://github.com/maximhq/bifrost) LLM
 gateway and exposes its OpenAI-compatible API to other apps as an OpenHost
 cross-app service.
 
+## Before you start
+
+Bifrost is a **router** for LLM inference, not a model itself. To make it
+useful you configure it in the web UI:
+
+- **Bring your own provider keys.** You must add your own upstream provider API
+  keys (Anthropic, OpenAI, etc.) in Bifrost's web UI. The gateway forwards
+  requests to those providers using the keys you supply; it does not include any
+  model access of its own.
+- **Some features require a Bifrost enterprise license.** A number of Bifrost's
+  advanced features are gated behind a paid
+  [Bifrost enterprise license](https://github.com/maximhq/bifrost). The core
+  gateway — configuring providers and serving the OpenAI-compatible inference
+  API to your other OpenHost apps — works without one.
+
 ## How it works
 
 - **Bifrost** runs inside the container on loopback (`127.0.0.1:3000`), storing

@@ -5,9 +5,17 @@
 }
 
 :8080 {
+	# Don't log request/response headers: they're bloated and can contain
+	# secrets (e.g. X-Api-Key on service calls).
 	log {
 		output stdout
-		format console
+		format filter {
+			wrap console
+			fields {
+				request>headers delete
+				resp_headers delete
+			}
+		}
 	}
 
 	# OpenHost's health probe — must reach the app without auth.

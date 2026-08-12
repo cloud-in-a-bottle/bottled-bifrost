@@ -1,26 +1,26 @@
 # bifrost-llm-gateway
 
-An OpenHost app that runs the [Bifrost](https://github.com/maximhq/bifrost) LLM
-gateway and exposes its OpenAI-compatible API to other apps as an OpenHost
+A Cloud in a Bottle app that runs the [Bifrost](https://github.com/maximhq/bifrost) LLM
+gateway and exposes its OpenAI-compatible API to other apps as a Cloud in a Bottle
 cross-app service.
 
 ## How it works
 
 - **Bifrost** runs inside the container on loopback (`127.0.0.1:3000`), storing
-  its config + sqlite DB + logs in the OpenHost app-data dir (`[data].app_data`),
+  its config + sqlite DB + logs in the Cloud in a Bottle app-data dir (`[data].app_data`),
   so providers, keys, and logs persist across reloads. `start.sh` points
   Bifrost's `APP_DIR` at `$OPENHOST_APP_DATA_DIR`.
 - **Caddy** fronts it on the container port (`:8080`):
-  - `/health` — OpenHost's health probe (ungated).
+  - `/health` — Cloud in a Bottle's health probe (ungated).
   - `/service/*` — the cross-app **service interface**. Requires a `full_access`
-    grant in `X-OpenHost-Permissions` (injected by the OpenHost router on service
+    grant in `X-OpenHost-Permissions` (injected by the Cloud in a Bottle router on service
     calls); without it, returns `403 permission_required`. It exposes **only**
     Bifrost's inference APIs (`/openai`, `/anthropic`, `/genai`) — the web UI and
     management API are not reachable through it (`404`). The `/service` prefix is
     stripped, so `/service/openai/v1/chat/completions` reaches Bifrost as
     `/openai/v1/chat/completions`.
   - everything else — Bifrost's **web UI + management API**, *not* gated by Caddy.
-    The app declares no `public_paths`, so OpenHost gates these to the logged-in
+    The app declares no `public_paths`, so Cloud in a Bottle gates these to the logged-in
     owner.
 
 The owner configures upstream providers and API keys in Bifrost's web UI;

@@ -1,7 +1,7 @@
 [app]
 name = "bifrost-llm-gateway"
 version = "0.1.0"
-description = "Bifrost LLM gateway, exposing an OpenAI-compatible endpoint as an OpenHost service."
+description = "Bifrost LLM gateway, exposing an OpenAI-compatible endpoint as a Cloud in a Bottle service."
 
 [runtime.container]
 image = "Dockerfile"

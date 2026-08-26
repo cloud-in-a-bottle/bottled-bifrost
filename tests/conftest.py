@@ -3,6 +3,15 @@ from collections.abc import Iterator
 import pytest
 from openhost_test_harness import OpenhostStack
 
+# Pinned so tests that need to look inside the container (`podman exec`) can
+# address it, rather than relying on the harness's default naming.
+_CONTAINER_NAME = "openhost-test-bifrost-llm-gateway-container"
+
+
+@pytest.fixture(scope="session")
+def container_name() -> str:
+    return _CONTAINER_NAME
+
 
 @pytest.fixture(scope="session")
 def stack() -> Iterator[OpenhostStack]:
@@ -15,5 +24,5 @@ def stack() -> Iterator[OpenhostStack]:
     - stack.url     — through the mock router (auth header injected, like a real owner request)
     - stack.app_url — direct to the container (control your own headers; eg the health probe)
     """
-    with OpenhostStack() as s:
+    with OpenhostStack(container_name=_CONTAINER_NAME) as s:
         yield s

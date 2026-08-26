@@ -18,6 +18,10 @@ cpu_millicores = 1000
 # Bifrost stores its config + sqlite DB (providers, keys, logs) here.
 app_data = true
 
+# npm cache for STDIO MCP servers, so `npx -y <server>` doesn't refetch from the
+# npm registry on every boot. Recreatable, so it doesn't belong in app_data.
+app_temp_data = true
+
 # Exposes Bifrost's OpenAI-compatible API as an OpenHost service. Caddy gates
 # this endpoint behind a `full_access` grant and limits it to the inference API
 # (the web UI is not reachable through it). A consumer call to

@@ -19,8 +19,10 @@ env/
 test-results/
 playwright-report/
 
-# Local app data / sqlite
+# Local app data / sqlite (`just run` mounts these)
 *.db
+/data/
+/temp_data/
 
 # IDE
 .idea/

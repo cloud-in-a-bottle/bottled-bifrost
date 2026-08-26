@@ -8,6 +8,13 @@ set -e
 
 export APP_DIR="$OPENHOST_APP_DATA_DIR"
 
+# Bifrost execs STDIO MCP servers (typically `npx -y <server>`) as child
+# processes, inheriting this env. Cache their downloads in the temp data dir,
+# which survives container boots, instead of refetching on every start.
+: "${OPENHOST_APP_TEMP_DIR:?OPENHOST_APP_TEMP_DIR is not set; enable [data].app_temp_data in openhost.toml}"
+export npm_config_cache="$OPENHOST_APP_TEMP_DIR/npm-cache"
+mkdir -p "$npm_config_cache"
+
 # Bifrost listens on loopback only; Caddy fronts it on :8080 (see Caddyfile), so
 # the gateway can't be reached without going through Caddy's service gate.
 export APP_PORT=3000

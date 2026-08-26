@@ -15,10 +15,12 @@ build:
 # Build and run the container locally on http://localhost:8080, persisting
 # Bifrost's data under ./data. Configure providers + keys in the web UI.
 run: build
-    mkdir -p ./data
+    mkdir -p ./data ./temp_data
     docker run --rm -p 8080:8080 \
         -e OPENHOST_APP_DATA_DIR=/data/app_data/bifrost-llm-gateway \
+        -e OPENHOST_APP_TEMP_DIR=/data/app_temp_data/bifrost-llm-gateway \
         -v $(pwd)/data:/data/app_data/bifrost-llm-gateway \
+        -v $(pwd)/temp_data:/data/app_temp_data/bifrost-llm-gateway \
         {{image}}
 
 # Run the test suite (builds the Dockerfile and runs it under podman).

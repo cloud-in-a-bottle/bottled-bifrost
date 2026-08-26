@@ -1,3 +1,5 @@
+import subprocess
+
 import httpx
 from openhost_test_harness import OpenhostStack
 from playwright.sync_api import Page
@@ -50,3 +52,31 @@ def test_web_ui_loads_without_auth_gate(stack: OpenhostStack, page: Page) -> Non
     page.goto(stack.app_url, wait_until="domcontentloaded")
     expect(page).to_have_title("Bifrost")
     expect(page.locator("#root")).not_to_be_empty()
+
+
+def _in_container(container_name: str, command: str) -> str:
+    result = subprocess.run(
+        ["podman", "exec", container_name, "sh", "-c", command],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return result.stdout.strip()
+
+
+def test_npx_available_for_stdio_mcp_servers(stack: OpenhostStack, container_name: str) -> None:
+    # Bifrost runs STDIO MCP servers by exec'ing their command (usually
+    # `npx -y <server>`) inside this container, so it needs a JS runtime.
+    assert _in_container(container_name, "command -v npx") == "/usr/bin/npx"
+
+
+def test_npm_cache_lives_in_temp_data(stack: OpenhostStack, container_name: str) -> None:
+    # start.sh points npm's cache at the temp data dir, which survives container
+    # boots, so npx doesn't refetch MCP servers on every start. Read it off PID 1
+    # (podman exec gets the image env, not start.sh's exports); every Bifrost
+    # child process inherits the same env.
+    assert stack.temp_data_dir is not None
+    env = _in_container(container_name, "tr '\\0' '\\n' < /proc/1/environ")
+    expected = f"/data/app_temp_data/{stack.manifest.app.name}/npm-cache"
+    assert f"npm_config_cache={expected}" in env.splitlines()
+    assert (stack.temp_data_dir / "npm-cache").is_dir()

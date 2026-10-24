@@ -77,6 +77,6 @@ def test_npm_cache_lives_in_temp_data(stack: OpenhostStack, container_name: str)
     # child process inherits the same env.
     assert stack.temp_data_dir is not None
     env = _in_container(container_name, "tr '\\0' '\\n' < /proc/1/environ")
-    expected = f"/data/app_temp_data/{stack.manifest.app.name}/npm-cache"
+    expected = f"/data/app_temp_data/{stack.manifest.name}/npm-cache"
     assert f"npm_config_cache={expected}" in env.splitlines()
     assert (stack.temp_data_dir / "npm-cache").is_dir()

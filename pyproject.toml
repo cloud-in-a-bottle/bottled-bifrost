@@ -14,9 +14,9 @@ dev = [
     "pytest-playwright",
     "playwright",
     # Builds the app's Dockerfile, runs it under podman with the mounts/env its
-    # openhost.toml declares, and fronts it with a mock router that injects owner
-    # auth. Tests hit a real, containerized app. Requires podman on the host.
-    "openhost-test-harness @ git+https://github.com/imbue-openhost/openhost-app-test-harness@main",
+    # cloudinabottle.toml declares, and fronts it with the real Cloud in a Bottle
+    # router. Tests hit a real, containerized app. Requires podman on the host.
+    "openhost[test-harness] @ git+https://github.com/cloud-in-a-bottle/cloud-in-a-bottle@main",
 ]
 
 [tool.uv]

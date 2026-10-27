@@ -6,7 +6,8 @@ set -e
 # falling back to ephemeral container storage.
 : "${OPENHOST_APP_DATA_DIR:?OPENHOST_APP_DATA_DIR is not set; enable [data].app_data in openhost.toml}"
 
-export APP_DIR="$OPENHOST_APP_DATA_DIR"
+# TEMP: disabled to show test_config_is_stored_in_app_data fails without it
+# export APP_DIR="$OPENHOST_APP_DATA_DIR"
 
 # Bifrost execs STDIO MCP servers (typically `npx -y <server>`) as child
 # processes, inheriting this env. Cache their downloads in the temp data dir,

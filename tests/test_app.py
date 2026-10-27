@@ -80,3 +80,21 @@ def test_npm_cache_lives_in_temp_data(stack: OpenhostStack, container_name: str)
     expected = f"/data/app_temp_data/{stack.manifest.name}/npm-cache"
     assert f"npm_config_cache={expected}" in env.splitlines()
     assert (stack.temp_data_dir / "npm-cache").is_dir()
+
+
+def test_config_is_stored_in_app_data(stack: OpenhostStack) -> None:
+    # start.sh points Bifrost's APP_DIR at the app-data dir, so providers and keys the
+    # owner configures are backed up and survive reloads. Upstream's default is
+    # /app/data inside the container, which is lost on every redeploy.
+    session = stack.owner_session
+    response = session.post(f"{stack.url}/api/providers", json={"provider": "groq"}, timeout=30)
+    assert response.status_code in (200, 409), f"{response.status_code}: {response.text[:500]}"
+    response = session.get(f"{stack.url}/api/providers", timeout=30)
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:500]}"
+    names = [provider["name"] for provider in response.json()["providers"]]
+    assert "groq" in names, names
+    config_db = stack.data_dir / "config.db"
+    assert config_db.is_file(), (
+        f"{config_db} missing; app data dir has {sorted(p.name for p in stack.data_dir.iterdir())}\n"
+        f"{stack.app_logs()[-3000:]}"
+    )

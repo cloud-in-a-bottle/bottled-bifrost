@@ -1,5 +1,5 @@
 # Pinned by tag and multi-arch index digest; bump both together.
-FROM docker.io/maximhq/bifrost:v1.6.6@sha256:0c0e6f498944d2896867fd9a5e51a79bb9cc82b845763fc4ababe0a6d2ab4402
+FROM docker.io/maximhq/bifrost:v2.3.1@sha256:fe323e244998e1a40b87be87f60d023746eae40dd69baae8f7f42728a5e16149
 
 # Caddy fronts Bifrost on the container port: it permission-gates the cross-app
 # service interface and limits it to the inference API, while leaving the web UI

@@ -20,7 +20,9 @@ mkdir -p "$npm_config_cache"
 export APP_PORT=3000
 export APP_HOST=127.0.0.1
 
-# Bifrost's stock entrypoint fixes data-dir permissions then starts /app/main.
-/app/docker-entrypoint.sh /app/main &
+caddy run --config /etc/caddy/Caddyfile --adapter caddyfile &
+export CADDY_PID=$!
 
-exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+# owner-proxy.mjs starts Bifrost (through its stock entrypoint), creates the
+# admin account on first boot, and signs the OpenHost owner in as that admin.
+exec node /app/owner-proxy.mjs

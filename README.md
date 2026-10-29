@@ -34,9 +34,28 @@ useful you configure it in the web UI:
     management API are not reachable through it (`404`). The `/service` prefix is
     stripped, so `/service/openai/v1/chat/completions` reaches Bifrost as
     `/openai/v1/chat/completions`.
-  - everything else — Bifrost's **web UI + management API**, *not* gated by Caddy.
-    The app declares no `public_paths`, so Cloud in a Bottle gates these to the logged-in
-    owner.
+  - everything else — Bifrost's **web UI + management API**, through
+    `owner-proxy.mjs` (below). The app declares no `public_paths`, so Cloud in a
+    Bottle gates these to the logged-in owner.
+- **owner-proxy.mjs** signs the owner in to Bifrost. Since v2, Bifrost's
+  management API needs a real admin account. On first boot (including the first
+  boot after upgrading from v1), it restarts Bifrost with a random one-time setup
+  token, creates an admin account `openhost-admin` with a random password, saves
+  those credentials to `openhost-admin.json` in the app-data dir (mode 0600),
+  sets Bifrost's allowed origins to the app's public origin, and restarts Bifrost
+  without the token. It then signs in with Bifrost's own login API and attaches
+  that session to requests the router marks as the owner's
+  (`X-OpenHost-Is-Owner`), signing in again when the session expires or is
+  logged out. It strips Bifrost credentials (session cookies, `Authorization`,
+  setup/temp-token headers) from every other request, so only the owner is
+  admin. Don't change the admin's password or turn off dashboard auth in
+  Bifrost's UI: the proxy signs in with the saved credentials (turning auth off
+  is undone on the next boot).
+- **Inference auth stays off**: Bifrost v2 turns `enforce_auth_on_inference` on
+  for new installs; the bootstrap turns it off on a fresh install (upgraded
+  instances keep their setting), since Caddy's `full_access` gate is what
+  authenticates service calls. Turning it on in the UI makes every consumer app
+  need a Bifrost virtual key.
 
 The owner configures upstream providers and API keys in Bifrost's web UI;
 consumer apps call the gateway through the router and never see those keys.

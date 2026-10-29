@@ -18,9 +18,10 @@
 		}
 	}
 
-	# OpenHost's health probe — must reach the app without auth.
+	# OpenHost's health probe — must reach the app without auth. Goes through
+	# owner-proxy.mjs, which reports unhealthy until the admin bootstrap is done.
 	handle /health {
-		reverse_proxy 127.0.0.1:3000
+		reverse_proxy 127.0.0.1:3001
 	}
 
 	# Cross-app service interface. The OpenHost router proxies service calls here
@@ -42,9 +43,10 @@
 		}
 	}
 
-	# Bifrost web UI + management API. Not permission-gated here — OpenHost gates
-	# these to the logged-in owner (the app declares no public_paths).
+	# Bifrost web UI + management API. OpenHost gates these to the logged-in
+	# owner (the app declares no public_paths); owner-proxy.mjs signs the owner
+	# in to Bifrost as its admin and strips Bifrost credentials from anyone else.
 	handle {
-		reverse_proxy 127.0.0.1:3000
+		reverse_proxy 127.0.0.1:3001
 	}
 }

@@ -80,3 +80,5 @@ Tests use `openhost-test-harness`, which builds the Dockerfile and runs the app
 under **podman** (so podman must be running). They exercise the permission gate
 directly via `stack.app_url` (the harness's mock router doesn't simulate service
 calls, so the `X-OpenHost-Permissions` header is supplied by the test).
+
+`cloudinabottle.toml` sets `prebuilt_image`, so Cloud in a Bottle pulls our signed prebuilt image (built by CI from each release tag) instead of building the Dockerfile. To fork and modify this app, comment out `prebuilt_image` so your instance builds from source.

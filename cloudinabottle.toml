@@ -1,6 +1,7 @@
 [app]
 name = "bifrost-llm-gateway"
-version = "1.0.0"
+version = "1.0.1"
+release_tag_format = "semver"
 description = "Bifrost LLM gateway, exposing an OpenAI-compatible endpoint as a Cloud in a Bottle service."
 
 [runtime.container]
